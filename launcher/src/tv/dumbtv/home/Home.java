@@ -53,6 +53,7 @@ public final class Home extends Activity {
     static final long UNLOCK_MS = 3000;
     private static final int MATCH = ViewGroup.LayoutParams.MATCH_PARENT;
     private static final int WRAP = ViewGroup.LayoutParams.WRAP_CONTENT;
+    private static final String APPSTORE = "com.amazon.venezia";
 
     private final Handler ui = new Handler(Looper.getMainLooper());
     private final ExecutorService io = Executors.newSingleThreadExecutor();
@@ -79,6 +80,15 @@ public final class Home extends Activity {
     private ValueAnimator colorAnimation;
     private int displayedColor, targetColor;
     private boolean tintWallpaper;
+
+    private Intent appIntent(Item it) {
+        if (APPSTORE.equals(it.id)) {
+            Intent store = new Intent(Intent.ACTION_MAIN)
+                    .setClassName(APPSTORE, APPSTORE + ".ade.ADEHomeActivity");
+            if (store.resolveActivity(getPackageManager()) != null) return store;
+        }
+        return new Intent(it.intent);
+    }
 
     private final BroadcastReceiver packages = new BroadcastReceiver() {
         @Override
@@ -963,7 +973,7 @@ public final class Home extends Activity {
 
     private void open(Tile t) {
         if (Catalog.APPS.equals(t.kind)) {
-            launch(new Intent(t.item.intent), t.item.id);
+            launch(appIntent(t.item), t.item.id);
             return;
         }
         Intent own = Input.intent(this, cfg, t.item, Catalog.label(cfg, t.item));
